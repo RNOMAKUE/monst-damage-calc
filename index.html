@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>友情ワンパンライン計算ツール</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 20px; border-bottom: 2px solid #ff4b4b; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; background: #ff4b4b; color: white; border: none; padding: 14px; font-size: 18px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { background: #e04343; }
+        .result { margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 4px; border-left: 5px solid #2196F3; }
+        .result p { margin: 8px 0; font-size: 16px; }
+        .highlight { font-size: 24px; font-weight: bold; color: #d32f2f; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>友情ワンパンライン計算ツール</h1>
+        
+        <div class="form-group">
+            <label>ボスのHP (例: 120,000,000)</label>
+            <input type="number" id="hp" value="120000000">
+        </div>
+        
+        <div class="form-group">
+            <label>友情コンボの元の威力 (友情火力)</label>
+            <input type="number" id="power" value="401625">
+        </div>
+
+        <div class="form-group">
+            <label>属性倍率 (例: 1.33)</label>
+            <input type="number" step="0.01" id="attribute" value="1.33">
+        </div>
+
+        <div class="form-group">
+            <label>弱点倍率 (例: 3)</label>
+            <input type="number" step="0.1" id="weakness" value="3">
+        </div>
+
+        <div class="form-group">
+            <label>キラー・剣などのその他の倍率合算 (例: 剣5倍×キラー2倍なら10)</label>
+            <input type="number" step="0.1" id="other" value="5">
+        </div>
+
+        <div class="form-group">
+            <label>本体へのヒット判定数 (例: 2)</label>
+            <input type="number" id="hits" value="2">
+        </div>
+
+        <button onclick="calculate()">計算する</button>
+
+        <div class="result" id="result-box" style="display: none;">
+            <p>弱点ダメージ: <span id="weak-dmg">0</span></p>
+            <p>本体ダメージ: <span id="body-dmg">0</span></p>
+            <p>合計ダメージ: <span id="total-dmg" class="highlight">0</span></p>
+            <p>判定: <span id="diff-dmg" style="font-weight:bold;">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // 入力された数字を取得
+            const hp = Number(document.getElementById('hp').value);
+            const power = Number(document.getElementById('power').value);
+            const attr = Number(document.getElementById('attribute').value);
+            const weak = Number(document.getElementById('weakness').value);
+            const other = Number(document.getElementById('other').value);
+            const hits = Number(document.getElementById('hits').value);
+
+            // ダメージ計算（エクセルの計算式をプログラムで再現）
+            const weakDmg = Math.floor(power * attr * other * weak);
+            const bodyDmg = Math.floor(power * attr * other * hits);
+            const total = weakDmg + bodyDmg;
+            const diff = hp - total;
+
+            // 画面に結果を表示する
+            document.getElementById('weak-dmg').innerText = weakDmg.toLocaleString();
+            document.getElementById('body-dmg').innerText = bodyDmg.toLocaleString();
+            document.getElementById('total-dmg').innerText = total.toLocaleString();
+            
+            const diffElem = document.getElementById('diff-dmg');
+            if (diff > 0) {
+                diffElem.innerText = diff.toLocaleString() + " ダメージ不足！（ワンパン不可）";
+                diffElem.style.color = "red";
+            } else {
+                diffElem.innerText = Math.abs(diff).toLocaleString() + " ダメージ余裕あり（ワンパン成功！）";
+                diffElem.style.color = "blue";
+            }
+
+            document.getElementById('result-box').style.display = "block";
+        }
+    </script>
+</body>
+</html>
